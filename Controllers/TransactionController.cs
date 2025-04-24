@@ -11,21 +11,25 @@ namespace Homework_SkillTree.Controllers
             {
                 new TransactionViewModel
                 {
-                    TransactionType = TransactionType.Expense,
+                    TransactionType = TransactionType.Income,
                     Date = new DateTime(2025, 1, 1),
-                    Amount = 300
+                    Amount = 1600,
+                    Remark = "設計費"
+                    
                 },
                 new TransactionViewModel
                 {
-                    TransactionType = TransactionType.Income,
+                    TransactionType = TransactionType.Expense,
                     Date = new DateTime(2025, 1, 2),
-                    Amount = 1600
+                    Amount = 300,
+                    Remark = "下午茶"
                 },
                  new TransactionViewModel
                 {
-                     TransactionType = TransactionType.Expense,
-                     Date = new DateTime(2025, 1, 3),
-                    Amount = 800
+                    TransactionType = TransactionType.Expense,
+                    Date = new DateTime(2025, 1, 3),
+                    Amount = 160,
+                    Remark = "小火鍋"
                 }
             };
             return View(transactions);

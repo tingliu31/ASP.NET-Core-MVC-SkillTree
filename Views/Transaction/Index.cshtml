@@ -7,23 +7,27 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<table class="table table-bordered table-striped">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>#</th>
             <th>類別</th>
             <th>日期</th>
             <th>金額</th>
+            <th>備註</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            var rowClass = item.TransactionType == TransactionType.Expense ? "table-secondary" : ""; // 灰底 class
+
+            <tr class="@rowClass">
                 <td>@index</td>
                 <td>@GetDisplayName(item.TransactionType)</td>
                 <td>@item.Date.ToString("yyyy-MM-dd")</td>
                 <td>@item.Amount.ToString("N0")</td>
+                <td>@item.Remark</td>
             </tr>
             index++;
         }
