@@ -16,7 +16,7 @@ namespace Homework_SkillTree.Models
         public TransactionType TransactionType { get; set; }
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
+        public string Remark { get; set; }
     }
-
 
 }
