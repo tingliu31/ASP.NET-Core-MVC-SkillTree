@@ -1,38 +1,61 @@
-﻿using Homework_SkillTree.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Transactions;
+using Homework_SkillTree.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Homework_SkillTree.Controllers
 {
-    public class TransactionController : Controller
+    public class TransactionController(MyDbContext context) : Controller
     {
+        
+        [HttpGet]
+        public IActionResult Create()
+        {
+            ViewBag.TypeList = GetTransactionTypeList();
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(TransactionViewModel pageData)
+        {
+            if (ModelState.IsValid)
+            {
+                ViewBag.TypeList = GetTransactionTypeList();
+                return RedirectToAction("Index");
+            }
+            ViewBag.TypeList = GetTransactionTypeList();
+            return View(pageData);
+        }
+
         public IActionResult Index()
         {
-            var transactions = new List<TransactionViewModel>
-            {
-                new TransactionViewModel
-                {
-                    TransactionType = TransactionType.Income,
-                    Date = new DateTime(2025, 1, 1),
-                    Amount = 1600,
-                    Remark = "設計費"
-                    
-                },
-                new TransactionViewModel
-                {
-                    TransactionType = TransactionType.Expense,
-                    Date = new DateTime(2025, 1, 2),
-                    Amount = 300,
-                    Remark = "下午茶"
-                },
-                 new TransactionViewModel
-                {
-                    TransactionType = TransactionType.Expense,
-                    Date = new DateTime(2025, 1, 3),
-                    Amount = 160,
-                    Remark = "小火鍋"
-                }
-            };
+            var transactions = context.Transactions
+                .OrderByDescending(t => t.Date) // 可以排序最新的在前面
+                .ToList();
             return View(transactions);
         }
+
+        private List<SelectListItem> GetTransactionTypeList()
+        {
+            return Enum.GetValues(typeof(TransactionType))
+                       .Cast<TransactionType>()
+                       .Select(t => new SelectListItem
+                       {
+                           Value = t.ToString(),               // 用於表單送出
+                           Text = GetDisplayName(t)            // 顯示中文名
+                       })
+                       .ToList();
+        }
+
+        private string GetDisplayName(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attr = field.GetCustomAttributes(typeof(DisplayAttribute), false)
+                            .Cast<DisplayAttribute>()
+                            .FirstOrDefault();
+            return attr?.Name ?? value.ToString();
+        }
+
     }
 }
