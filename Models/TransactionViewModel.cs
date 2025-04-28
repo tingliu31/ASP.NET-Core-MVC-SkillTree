@@ -2,20 +2,19 @@
 
 namespace Homework_SkillTree.Models
 {
-
-    public enum TransactionType
-    {
-        [Display(Name = "收入")]
-        Income,
-        [Display(Name = "支出")]
-        Expense
-    }
-
     public class TransactionViewModel
     {
+  
+        [Display(Name = "類別")]
         public TransactionType TransactionType { get; set; }
-        public DateTime Date { get; set; }
+
+        [Display(Name = "日期")]
+        public DateOnly Date { get; set; }
+
+        [Display(Name = "金額")]
         public decimal Amount { get; set; }
+
+        [Display(Name = "備註")]
         public string Remark { get; set; }
     }
 
