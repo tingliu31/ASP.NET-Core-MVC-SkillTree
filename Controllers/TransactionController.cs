@@ -12,8 +12,15 @@ namespace Homework_SkillTree.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            // 建立新的 TransactionViewModel 物件
+            var model = new TransactionViewModel
+            {
+                // 設定 Date 屬性的預設值為今天的日期
+                Date = DateOnly.FromDateTime(DateTime.Now)
+            };
+
             ViewBag.TypeList = GetTransactionTypeList();
-            return View();
+            return View(model);
         }
 
         [HttpPost]

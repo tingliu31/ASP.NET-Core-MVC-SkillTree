@@ -12,7 +12,7 @@ namespace Homework_SkillTree.Models
         public DateOnly Date { get; set; }
 
         [Display(Name = "金額")]
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
 
         [Display(Name = "備註")]
         public string Remark { get; set; }
