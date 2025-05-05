@@ -40,7 +40,16 @@ namespace Homework_SkillTree.Controllers
             var transactions = context.Transactions
                 .OrderByDescending(t => t.Date) // 可以排序最新的在前面
                 .ToList();
-            return View(transactions);
+
+            var viewModels = transactions.Select(t => new TransactionViewModel
+            {
+                TransactionType = t.TransactionType,
+                Date = DateOnly.FromDateTime(t.Date), // 轉成 DateOnly
+                Amount = t.Amount,
+                Remark = t.Remark ?? string.Empty
+            }).ToList();
+
+            return View(viewModels);
         }
 
         private List<SelectListItem> GetTransactionTypeList()
