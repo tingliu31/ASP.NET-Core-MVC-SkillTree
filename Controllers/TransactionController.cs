@@ -35,21 +35,33 @@ namespace Homework_SkillTree.Controllers
             return View(pageData);
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
+            int pageSize = 20;
+
             var transactions = context.Transactions
                 .OrderByDescending(t => t.Date) // 可以排序最新的在前面
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
-            var viewModels = transactions.Select(t => new TransactionViewModel
-            {
-                TransactionType = t.TransactionType,
-                Date = DateOnly.FromDateTime(t.Date), // 轉成 DateOnly
-                Amount = t.Amount,
-                Remark = t.Remark ?? string.Empty
-            }).ToList();
+            int totalCount = context.Transactions.Count();
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            return View(viewModels);
+            var viewModel = new TransactionListViewModel
+            {
+                Transactions = transactions.Select(t => new TransactionViewModel
+                {
+                    TransactionType = t.TransactionType,
+                    Date = DateOnly.FromDateTime(t.Date),
+                    Amount = t.Amount,
+                    Remark = t.Remark
+                }).ToList(),
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+
+            return View(viewModel);
         }
 
         private List<SelectListItem> GetTransactionTypeList()
