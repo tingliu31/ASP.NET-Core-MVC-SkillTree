@@ -6,29 +6,85 @@
     var index = 1 + (Model.CurrentPage - 1) * 20;
 }
 
+
 <h2>@ViewData["Title"]</h2>
+
+<style>
+    .table th,
+    .table td {
+        vertical-align: middle;
+        text-align: center;
+        white-space: nowrap;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .col-index {
+        min-width: 30px;
+    }
+
+    .col-fixed {
+        width: 80px;
+    }
+
+    .col-amount {
+        min-width: 120px;
+    }
+
+    .remark-cell {
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .table {
+        width: 100%;
+        table-layout: auto;
+    }
+
+    .income-text {
+        color: blue;
+    }
+
+    .expense-text {
+        color: red;
+    }
+
+</style>
 
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>#</th>
-            <th>類別</th>
-            <th>日期</th>
-            <th>金額</th>
-            <th>備註</th>
+            <th class="col-index">#</th>
+            <th class="col-fixed">類別</th>
+            <th class="col-fixed">日期</th>
+            <th class="col-amount">金額</th>
+            <th class="remark-cell">備註</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Transactions)
         {
-            var rowClass = item.TransactionType == TransactionType.Expense ? "table-secondary" : ""; // 灰底 class
+            var rowClass = item.TransactionType == TransactionType.Expense ? "table-secondary" : "";
 
             <tr class="@rowClass">
                 <td>@index</td>
-                <td>@EnumHelper.GetDisplayName(item.TransactionType)</td>
+                <td class="@(item.TransactionType == TransactionType.Expense ? "expense-text" : "income-text")">
+                    @EnumHelper.GetDisplayName(item.TransactionType)
+                </td>
                 <td>@item.Date.ToString("yyyy-MM-dd")</td>
                 <td>@item.Amount.ToString("N0")</td>
-                <td>@item.Remark</td>
+                <td class="remark-cell">
+                    @{
+                        var remarkText = string.IsNullOrEmpty(item.Remark)
+                        ? ""
+                        : item.Remark.Length > 100
+                        ? item.Remark.Substring(0, 100) + "..."
+                        : item.Remark;
+                    }
+                    @remarkText
+                </td>
             </tr>
             index++;
         }
