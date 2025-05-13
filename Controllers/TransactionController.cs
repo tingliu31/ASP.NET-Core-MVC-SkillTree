@@ -28,13 +28,32 @@ namespace Homework_SkillTree.Controllers
         [HttpPost]
         public IActionResult Create(TransactionViewModel pageData)
         {
-            if (ModelState.IsValid)
-            {
-                ViewBag.TypeList = GetTransactionTypeList();
-                return RedirectToAction("Index");
-            }
             ViewBag.TypeList = GetTransactionTypeList();
-            return View(pageData);
+
+            // 檢查日期是否為未來
+            if (pageData.Date > DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(pageData.Date), "日期不能晚於今天");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(pageData);
+            }
+
+            // 資料驗證成功，寫入資料庫
+            var transaction = new Models.Transaction
+            {
+                TransactionType = pageData.TransactionType,
+                Date = pageData.Date.ToDateTime(TimeOnly.MinValue),
+                Amount = pageData.Amount,
+                Remark = pageData.Remark
+            };
+
+            context.Transactions.Add(transaction);
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Index(int page = 1)

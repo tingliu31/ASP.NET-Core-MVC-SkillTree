@@ -19,7 +19,7 @@ namespace Homework_SkillTree.Models
         public int Amount { get; set; }
 
         [Column("Remarkkk")]
-        public string? Remark { get; set; }
+        public string Remark { get; set; }
     }
 
 }
