@@ -3,6 +3,8 @@ using System.Transactions;
 using Homework_SkillTree.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace Homework_SkillTree.Controllers
 {
@@ -37,31 +39,20 @@ namespace Homework_SkillTree.Controllers
 
         public IActionResult Index(int page = 1)
         {
-            int pageSize = 20;
+            var pageSize = 20;
 
             var transactions = context.Transactions
-                .OrderByDescending(t => t.Date) // 可以排序最新的在前面
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            int totalCount = context.Transactions.Count();
-            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
-            var viewModel = new TransactionListViewModel
-            {
-                Transactions = transactions.Select(t => new TransactionViewModel
+                .OrderByDescending(t => t.Date)
+                .Select(t => new TransactionViewModel
                 {
                     TransactionType = t.TransactionType,
                     Date = DateOnly.FromDateTime(t.Date),
                     Amount = t.Amount,
                     Remark = t.Remark
-                }).ToList(),
-                CurrentPage = page,
-                TotalPages = totalPages
-            };
+                })
+                .ToPagedList(page, pageSize); // 這裡套用分頁
 
-            return View(viewModel);
+            return View(transactions);
         }
 
         private List<SelectListItem> GetTransactionTypeList()
@@ -79,9 +70,13 @@ namespace Homework_SkillTree.Controllers
         private string GetDisplayName(Enum value)
         {
             var field = value.GetType().GetField(value.ToString());
+            if (field == null)
+                return value.ToString();
+
             var attr = field.GetCustomAttributes(typeof(DisplayAttribute), false)
                             .Cast<DisplayAttribute>()
                             .FirstOrDefault();
+
             return attr?.Name ?? value.ToString();
         }
 

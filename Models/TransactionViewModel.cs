@@ -15,7 +15,7 @@ namespace Homework_SkillTree.Models
         public int Amount { get; set; }
 
         [Display(Name = "備註")]
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 
 }
