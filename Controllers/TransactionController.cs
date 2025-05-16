@@ -26,7 +26,8 @@ namespace Homework_SkillTree.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(TransactionViewModel pageData)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(TransactionViewModel pageData)
         {
             ViewBag.TypeList = GetTransactionTypeList();
 
@@ -41,9 +42,16 @@ namespace Homework_SkillTree.Controllers
                 return View(pageData);
             }
 
-            // 資料驗證成功，寫入資料庫
-            service.AddAsync(pageData);
-            return RedirectToAction("Index");
+            try
+            {
+                await service.AddAsync(pageData);
+                return RedirectToAction("index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(pageData);
+            }
         }
 
         public IActionResult Index(int page = 1)

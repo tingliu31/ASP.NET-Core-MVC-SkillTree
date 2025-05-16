@@ -63,7 +63,7 @@ namespace Homework_SkillTree.Service
             catch (DbUpdateException ex)
             {
                 // 可依需求記錄 log 或拋出自訂例外
-                throw new Exception("新增交易資料時發生錯誤", ex);
+                throw new Exception("新增資料時發生錯誤", ex);
             }
         }
 
