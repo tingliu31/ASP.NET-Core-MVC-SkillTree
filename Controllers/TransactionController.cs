@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using Homework_SkillTree.Models;
+using Homework_SkillTree.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using X.PagedList;
-using X.PagedList.Extensions;
 
 namespace Homework_SkillTree.Controllers
 {
-    public class TransactionController(MyDbContext context) : Controller
+    public class TransactionController(ITransactionService service) : Controller
     {
         
         [HttpGet]
@@ -42,36 +42,15 @@ namespace Homework_SkillTree.Controllers
             }
 
             // 資料驗證成功，寫入資料庫
-            var transaction = new Models.Transaction
-            {
-                TransactionType = pageData.TransactionType,
-                Date = pageData.Date.ToDateTime(TimeOnly.MinValue),
-                Amount = pageData.Amount,
-                Remark = pageData.Remark
-            };
-
-            context.Transactions.Add(transaction);
-            context.SaveChanges();
-
+            service.AddAsync(pageData);
             return RedirectToAction("Index");
         }
 
         public IActionResult Index(int page = 1)
         {
             var pageSize = 20;
-
-            var transactions = context.Transactions
-                .OrderByDescending(t => t.Date)
-                .Select(t => new TransactionViewModel
-                {
-                    TransactionType = t.TransactionType,
-                    Date = DateOnly.FromDateTime(t.Date),
-                    Amount = t.Amount,
-                    Remark = t.Remark
-                })
-                .ToPagedList(page, pageSize); // 這裡套用分頁
-
-            return View(transactions);
+            var result = service.GetPagedAsync(page, pageSize).Result; // 這裡使用非同步方法獲取資料
+            return View(result);
         }
 
         private List<SelectListItem> GetTransactionTypeList()
