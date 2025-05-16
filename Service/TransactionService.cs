@@ -18,7 +18,7 @@ namespace Homework_SkillTree.Service
         public async Task<List<TransactionViewModel>> GetAllAsync()
         {
             return await _context.Transactions
-                .OrderByDescending(t => t.Date)
+                .AsNoTracking()
                 .Select(t => new TransactionViewModel
                 {
                     TransactionType = t.TransactionType,
@@ -26,15 +26,14 @@ namespace Homework_SkillTree.Service
                     Amount = t.Amount,
                     Remark = t.Remark
                 })
+                .OrderByDescending(t => t.Date)
                 .ToListAsync();
         }
 
         public async Task<IPagedList<TransactionViewModel>> GetPagedAsync(int page, int pageSize)
         {
-            var query = _context.Transactions.AsNoTracking();
-
-            // Convert query to IPagedList using ToPagedListAsync
-            var result = await query
+            return await _context.Transactions
+                .AsNoTracking()
                 .Select(t => new TransactionViewModel
                 {
                     TransactionType = t.TransactionType,
@@ -44,8 +43,6 @@ namespace Homework_SkillTree.Service
                 })
                 .OrderByDescending(t => t.Date)
                 .ToPagedListAsync(page, pageSize);
-
-            return result;
         }
 
         public async Task AddAsync(TransactionViewModel viewModel)
@@ -59,7 +56,16 @@ namespace Homework_SkillTree.Service
             };
 
             _context.Transactions.Add(entity);
-            await _context.SaveChangesAsync(); //不行
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // 可依需求記錄 log 或拋出自訂例外
+                throw new Exception("新增交易資料時發生錯誤", ex);
+            }
         }
+
     }
 }
